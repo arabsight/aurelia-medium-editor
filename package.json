@@ -1,6 +1,6 @@
 {
   "name": "aurelia-medium-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "medium-editor plugin for Aurelia.",
   "keywords": [
     "aurelia",
@@ -20,8 +20,7 @@
     "url": "http://github.com/arabsight/aurelia-medium-editor"
   },
   "scripts": {
-    "postinstall": "gulp copy-medium-files",
-    "prepush": "gulp prepare-release --bump=minor",
+    "prepush": "gulp prepare-release --bump=patch",
     "push": "git add --all && git commit -m \"$(date)\" && git push origin master && npm publish",
     "test": "gulp test"
   },

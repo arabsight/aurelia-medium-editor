@@ -23,7 +23,7 @@ gulp.task('build-js', function() {
 
 gulp.task('build', function(callback) {
     return runSequence(
-        'clean', [
+        'clean', 'copy-medium-files', [
             'build-html',
             'build-css',
             'build-js'
