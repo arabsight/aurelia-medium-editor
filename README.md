@@ -33,5 +33,6 @@ aurelia.use
     <require from="aurelia-medium-editor/themes/default.css"></require>
 
     <medium-editor content.bind="message"></medium-editor>
+    <!-- options.bind="{medium-editor options}" to override the options for a particular instance -->
 </template>
 ```
