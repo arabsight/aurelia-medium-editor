@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.MediumEditorPlugin = undefined;
 
-var _dec, _dec2, _dec3, _class, _desc, _value, _class2, _descriptor;
+var _dec, _dec2, _dec3, _dec4, _class, _desc, _value, _class2, _descriptor, _descriptor2;
 
 var _mediumEditor = require('./medium-editor');
 
@@ -60,17 +60,21 @@ function _initializerWarningHelper(descriptor, context) {
     throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
-var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramework.customElement)('medium-editor'), _dec2 = (0, _aureliaFramework.inlineView)('<template>\n    <div class="editable" innerhtml.bind="content"></div>\n</template>'), _dec3 = (0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay }), _dec(_class = _dec2(_class = (_class2 = function () {
-    function MediumEditorPlugin() {
+var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramework.customElement)('medium-editor'), _dec2 = (0, _aureliaFramework.inlineView)('<template>\n    <div class="editable" innerhtml.bind="content"></div>\n</template>'), _dec3 = (0, _aureliaFramework.inject)(_aureliaFramework.Container), _dec4 = (0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay }), _dec(_class = _dec2(_class = _dec3(_class = (_class2 = function () {
+    function MediumEditorPlugin(container) {
         _classCallCheck(this, MediumEditorPlugin);
 
         _initDefineProp(this, 'content', _descriptor, this);
+
+        _initDefineProp(this, 'options', _descriptor2, this);
+
+        this.options = container.get('editor-config');
     }
 
     MediumEditorPlugin.prototype.attached = function attached() {
         var _this = this;
 
-        this.editor = new _mediumEditor2.default('medium-editor .editable');
+        this.editor = new _mediumEditor2.default('medium-editor .editable', this.options);
         this.editor.subscribe('editableInput', function (event, editable) {
             _this.content = editable.innerHTML;
         });
@@ -81,7 +85,10 @@ var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramew
     };
 
     return MediumEditorPlugin;
-}(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'content', [_dec3], {
+}(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'content', [_dec4], {
     enumerable: true,
     initializer: null
-})), _class2)) || _class) || _class);
+}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'options', [_aureliaFramework.bindable], {
+    enumerable: true,
+    initializer: null
+})), _class2)) || _class) || _class) || _class);
