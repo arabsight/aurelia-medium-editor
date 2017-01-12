@@ -4,25 +4,23 @@ import {
     inlineView,
     bindable,
     bindingMode,
-    inject,
     Container
 } from 'aurelia-framework';
 
 @customElement('medium-editor')
 @inlineView(`<template>
-    <div class="editable" innerhtml.bind="content"></div>
+    <div ref="mediumEditor" class="editable" innerhtml.bind="content"></div>
 </template>`)
-@inject(Container)
 export class MediumEditorPlugin {
     @bindable({ defaultBindingMode: bindingMode.twoWay }) content;
     @bindable options;
 
-    constructor(container) {
-        this.options = container.get('editor-config');
+    bind() {
+        this.options = Object.assign({}, Container.instance.get('editor-config', this.options));
     }
 
     attached() {
-        this.editor = new MediumEditor('medium-editor .editable', this.options);
+        this.editor = new MediumEditor(this.mediumEditor, this.options);
         this.editor.subscribe('editableInput', (event, editable) => {
             this.content = editable.innerHTML;
         });
