@@ -1,6 +1,8 @@
 # aurelia-medium-editor
 A wrapper around [medium-editor](https://github.com/yabwe/medium-editor) for Aurelia.
 
+[![NPM](https://nodei.co/npm/aurelia-medium-editor.png?compact=true)](https://nodei.co/npm/aurelia-medium-editor/)
+
 ## Usage with aurelia-cli
 ```
 npm i -S aurelia-medium-editor
@@ -34,5 +36,8 @@ aurelia.use
 
     <medium-editor content.bind="message"></medium-editor>
     <!-- options.bind="{medium-editor options}" to override the options for a particular instance -->
+    <medium-editor
+        content.bind="message"
+        options.bind="{disableEditing: true}"></medium-editor>
 </template>
 ```
