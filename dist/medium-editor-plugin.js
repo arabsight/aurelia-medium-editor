@@ -70,7 +70,7 @@ var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramew
     }
 
     MediumEditorPlugin.prototype.bind = function bind() {
-        this.options = Object.assign({}, _aureliaFramework.Container.instance.get('editor-config', this.options));
+        this.options = Object.assign({}, _aureliaFramework.Container.instance.get('editor-config'), this.options);
     };
 
     MediumEditorPlugin.prototype.attached = function attached() {

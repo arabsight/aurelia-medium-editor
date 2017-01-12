@@ -16,7 +16,7 @@ export class MediumEditorPlugin {
     @bindable options;
 
     bind() {
-        this.options = Object.assign({}, Container.instance.get('editor-config', this.options));
+        this.options = Object.assign({}, Container.instance.get('editor-config'), this.options);
     }
 
     attached() {
