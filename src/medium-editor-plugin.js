@@ -20,6 +20,7 @@ export class MediumEditorPlugin {
     }
 
     attached() {
+        this.options.elementsContainer = this.mediumEditor.parentNode;
         this.editor = new MediumEditor(this.mediumEditor, this.options);
         this.editor.subscribe('editableInput', (event, editable) => {
             this.content = editable.innerHTML;
@@ -27,6 +28,9 @@ export class MediumEditorPlugin {
     }
 
     detached() {
-        this.editor.distroy();
+        if (this.editor) {
+            this.editor.destroy();
+            this.editor = null;
+        }
     }
 }

@@ -1,3 +1,4 @@
+export MediumEditor from './medium-editor';
 export { MediumEditorPlugin } from './medium-editor-plugin';
 
 export function configure(config, editorConfig) {

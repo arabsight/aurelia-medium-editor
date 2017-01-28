@@ -76,6 +76,7 @@ var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramew
     MediumEditorPlugin.prototype.attached = function attached() {
         var _this = this;
 
+        this.options.elementsContainer = this.mediumEditor.parentNode;
         this.editor = new _mediumEditor2.default(this.mediumEditor, this.options);
         this.editor.subscribe('editableInput', function (event, editable) {
             _this.content = editable.innerHTML;
@@ -83,7 +84,10 @@ var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramew
     };
 
     MediumEditorPlugin.prototype.detached = function detached() {
-        this.editor.distroy();
+        if (this.editor) {
+            this.editor.destroy();
+            this.editor = null;
+        }
     };
 
     return MediumEditorPlugin;
