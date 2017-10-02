@@ -1,7 +1,7 @@
 import { PLATFORM } from 'aurelia-pal';
 
 export { default } from './medium-editor';
-export { MediumEditorPlugin } from './medium-editor-plugin';
+export { MediumEditor } from './medium-editor-plugin';
 
 export function configure(config, editorConfig) {
     if (typeof editorConfig === 'object') {

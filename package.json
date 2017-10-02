@@ -1,6 +1,6 @@
 {
     "name": "aurelia-medium-editor",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "description": "medium-editor plugin for Aurelia.",
     "keywords": [
         "aurelia",
@@ -73,6 +73,7 @@
     "aurelia": {
         "build": {
             "resources": [
+                "index",
                 "medium-editor-plugin"
             ]
         }

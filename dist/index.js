@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.MediumEditorPlugin = exports.default = undefined;
+exports.MediumEditor = exports.default = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -18,10 +18,10 @@ Object.defineProperty(exports, 'default', {
 
 var _mediumEditorPlugin = require('./medium-editor-plugin');
 
-Object.defineProperty(exports, 'MediumEditorPlugin', {
+Object.defineProperty(exports, 'MediumEditor', {
     enumerable: true,
     get: function get() {
-        return _mediumEditorPlugin.MediumEditorPlugin;
+        return _mediumEditorPlugin.MediumEditor;
     }
 });
 exports.configure = configure;
