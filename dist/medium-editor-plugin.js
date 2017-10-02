@@ -11,7 +11,11 @@ var _mediumEditor = require('./medium-editor');
 
 var _mediumEditor2 = _interopRequireDefault(_mediumEditor);
 
-var _aureliaFramework = require('aurelia-framework');
+var _aureliaBinding = require('aurelia-binding');
+
+var _aureliaDependencyInjection = require('aurelia-dependency-injection');
+
+var _aureliaTemplating = require('aurelia-templating');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60,7 +64,7 @@ function _initializerWarningHelper(descriptor, context) {
     throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
 }
 
-var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramework.customElement)('medium-editor'), _dec2 = (0, _aureliaFramework.inlineView)('<template>\n    <div ref="mediumEditor" class="editable" innerhtml.bind="content"></div>\n</template>'), _dec3 = (0, _aureliaFramework.bindable)({ defaultBindingMode: _aureliaFramework.bindingMode.twoWay }), _dec(_class = _dec2(_class = (_class2 = function () {
+var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaTemplating.customElement)('medium-editor'), _dec2 = (0, _aureliaTemplating.inlineView)('<template>\n    <div ref="mediumEditor" class="editable" innerhtml.bind="content"></div>\n</template>'), _dec3 = (0, _aureliaTemplating.bindable)({ defaultBindingMode: _aureliaBinding.bindingMode.twoWay }), _dec(_class = _dec2(_class = (_class2 = function () {
     function MediumEditorPlugin() {
         _classCallCheck(this, MediumEditorPlugin);
 
@@ -70,7 +74,7 @@ var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramew
     }
 
     MediumEditorPlugin.prototype.bind = function bind() {
-        this.options = Object.assign({}, _aureliaFramework.Container.instance.get('editor-config'), this.options);
+        this.options = Object.assign({}, _aureliaDependencyInjection.Container.instance.get('editor-config'), this.options);
     };
 
     MediumEditorPlugin.prototype.attached = function attached() {
@@ -94,7 +98,7 @@ var MediumEditorPlugin = exports.MediumEditorPlugin = (_dec = (0, _aureliaFramew
 }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'content', [_dec3], {
     enumerable: true,
     initializer: null
-}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'options', [_aureliaFramework.bindable], {
+}), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'options', [_aureliaTemplating.bindable], {
     enumerable: true,
     initializer: null
 })), _class2)) || _class) || _class);

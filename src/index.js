@@ -1,4 +1,6 @@
-export MediumEditor from './medium-editor';
+import { PLATFORM } from 'aurelia-pal';
+
+export { default } from './medium-editor';
 export { MediumEditorPlugin } from './medium-editor-plugin';
 
 export function configure(config, editorConfig) {
@@ -6,5 +8,5 @@ export function configure(config, editorConfig) {
         config.container.registerInstance('editor-config', editorConfig);
     }
 
-    config.globalResources('./medium-editor-plugin');
+    config.globalResources(PLATFORM.moduleName('./medium-editor-plugin'));
 }

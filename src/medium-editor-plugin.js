@@ -1,11 +1,7 @@
 import MediumEditor from './medium-editor';
-import {
-    customElement,
-    inlineView,
-    bindable,
-    bindingMode,
-    Container
-} from 'aurelia-framework';
+import { bindingMode } from 'aurelia-binding';
+import { Container } from 'aurelia-dependency-injection';
+import { bindable, customElement, inlineView } from 'aurelia-templating';
 
 @customElement('medium-editor')
 @inlineView(`<template>

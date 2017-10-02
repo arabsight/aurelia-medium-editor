@@ -444,6 +444,9 @@ if (!("classList" in document.createElement("_"))) {
                 Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
                 anchor.setAttribute('href', href);
                 if (target) {
+                    if (target === '_blank') {
+                        anchor.setAttribute('rel', 'noopener noreferrer');
+                    }
                     anchor.setAttribute('target', target);
                 }
                 return anchor;
@@ -506,8 +509,8 @@ if (!("classList" in document.createElement("_"))) {
 
             splitEndNodeIfNeeded: function splitEndNodeIfNeeded(currentNode, newNode, matchEndIndex, currentTextIndex) {
                 var textIndexOfEndOfFarthestNode, endSplitPoint;
-                textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length + (newNode ? currentNode.nodeValue.length : 0) - 1;
-                endSplitPoint = (newNode || currentNode).nodeValue.length - (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
+                textIndexOfEndOfFarthestNode = currentTextIndex + currentNode.nodeValue.length + (newNode ? newNode.nodeValue.length : 0) - 1;
+                endSplitPoint = matchEndIndex - currentTextIndex - (newNode ? currentNode.nodeValue.length : 0);
                 if (textIndexOfEndOfFarthestNode >= matchEndIndex && currentTextIndex !== textIndexOfEndOfFarthestNode && endSplitPoint !== 0) {
                     (newNode || currentNode).splitText(endSplitPoint);
                 }
@@ -782,12 +785,14 @@ if (!("classList" in document.createElement("_"))) {
                     url = anchorUrl || false;
                 if (el.nodeName.toLowerCase() === 'a') {
                     el.target = '_blank';
+                    el.rel = 'noopener noreferrer';
                 } else {
                     el = el.getElementsByTagName('a');
 
                     for (i = 0; i < el.length; i += 1) {
                         if (false === url || url === el[i].attributes.href.value) {
                             el[i].target = '_blank';
+                            el[i].rel = 'noopener noreferrer';
                         }
                     }
                 }
@@ -797,12 +802,14 @@ if (!("classList" in document.createElement("_"))) {
                 var i;
                 if (el.nodeName.toLowerCase() === 'a') {
                     el.removeAttribute('target');
+                    el.removeAttribute('rel');
                 } else {
                     el = el.getElementsByTagName('a');
 
                     for (i = 0; i < el.length; i += 1) {
                         if (anchorUrl === el[i].attributes.href.value) {
                             el[i].removeAttribute('target');
+                            el[i].removeAttribute('rel');
                         }
                     }
                 }
@@ -817,7 +824,13 @@ if (!("classList" in document.createElement("_"))) {
                         el.classList.add(classes[j]);
                     }
                 } else {
-                    el = el.getElementsByTagName('a');
+                    var aChildren = el.getElementsByTagName('a');
+                    if (aChildren.length === 0) {
+                        var parentAnchor = Util.getClosestTag(el, 'a');
+                        el = parentAnchor ? [parentAnchor] : [];
+                    } else {
+                        el = aChildren;
+                    }
                     for (i = 0; i < el.length; i += 1) {
                         for (j = 0; j < classes.length; j += 1) {
                             el[i].classList.add(classes[j]);
@@ -1888,15 +1901,17 @@ if (!("classList" in document.createElement("_"))) {
                     win = this.base.options.contentWindow,
                     doc = this.base.options.ownerDocument;
 
-                targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
+                if (targets !== null) {
+                    targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
 
-                Array.prototype.forEach.call(targets, function (target) {
-                    index = this.indexOfListener(target, event, listener, useCapture);
-                    if (index !== -1) {
-                        e = this.events.splice(index, 1)[0];
-                        e[0].removeEventListener(e[1], e[2], e[3]);
-                    }
-                }.bind(this));
+                    Array.prototype.forEach.call(targets, function (target) {
+                        index = this.indexOfListener(target, event, listener, useCapture);
+                        if (index !== -1) {
+                            e = this.events.splice(index, 1)[0];
+                            e[0].removeEventListener(e[1], e[2], e[3]);
+                        }
+                    }.bind(this));
+                }
             },
 
             indexOfListener: function indexOfListener(target, event, listener, useCapture) {
@@ -2582,6 +2597,14 @@ if (!("classList" in document.createElement("_"))) {
                 contentDefault: '<b>image</b>',
                 contentFA: '<i class="fa fa-picture-o"></i>'
             },
+            'html': {
+                name: 'html',
+                action: 'html',
+                aria: 'evaluate html',
+                tagNames: ['iframe', 'object'],
+                contentDefault: '<b>html</b>',
+                contentFA: '<i class="fa fa-code"></i>'
+            },
             'orderedlist': {
                 name: 'orderedlist',
                 action: 'insertorderedlist',
@@ -2739,6 +2762,7 @@ if (!("classList" in document.createElement("_"))) {
             }
         };
     })();
+
     (function () {
         'use strict';
 
@@ -2867,7 +2891,7 @@ if (!("classList" in document.createElement("_"))) {
                 template.push('<a href="#" class="medium-editor-toolbar-close">', this.getEditorOption('buttonLabels') === 'fontawesome' ? '<i class="fa fa-times"></i>' : this.formCloseLabel, '</a>');
 
                 if (this.targetCheckbox) {
-                    template.push('<div class="medium-editor-toolbar-form-row">', '<input type="checkbox" class="medium-editor-toolbar-anchor-target">', '<label>', this.targetCheckboxText, '</label>', '</div>');
+                    template.push('<div class="medium-editor-toolbar-form-row">', '<input type="checkbox" class="medium-editor-toolbar-anchor-target" id="medium-editor-toolbar-anchor-target-field-' + this.getEditorId() + '">', '<label for="medium-editor-toolbar-anchor-target-field-' + this.getEditorId() + '">', this.targetCheckboxText, '</label>', '</div>');
                 }
 
                 if (this.customClassOption) {
@@ -2985,16 +3009,27 @@ if (!("classList" in document.createElement("_"))) {
 
             checkLinkFormat: function checkLinkFormat(value) {
                 var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#/i,
+                    hasScheme = urlSchemeRegex.test(value),
+                    scheme = '',
                     telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/,
-                    split = value.split('?'),
-                    path = split[0],
-                    query = split[1];
+                    urlParts = value.match(/^(.*?)(?:\?(.*?))?(?:#(.*))?$/),
+                    path = urlParts[1],
+                    query = urlParts[2],
+                    fragment = urlParts[3];
 
                 if (telRegex.test(value)) {
                     return 'tel:' + value;
-                } else {
-                    return (urlSchemeRegex.test(value) ? '' : 'http://') + this.ensureEncodedUri(path) + (query === undefined ? '' : '?' + this.ensureEncodedQuery(query));
                 }
+
+                if (!hasScheme) {
+                    var host = path.split('/')[0];
+
+                    if (host.match(/.+(\.|:).+/) || host === 'localhost') {
+                        scheme = 'http://';
+                    }
+                }
+
+                return scheme + this.ensureEncodedUri(path) + (query === undefined ? '' : '?' + this.ensureEncodedQuery(query)) + (fragment === undefined ? '' : '#' + fragment);
             },
 
             doFormCancel: function doFormCancel() {
@@ -3127,7 +3162,9 @@ if (!("classList" in document.createElement("_"))) {
             },
 
             hidePreview: function hidePreview() {
-                this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+                if (this.anchorPreview) {
+                    this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+                }
                 this.activeAnchor = null;
             },
 
@@ -3347,7 +3384,7 @@ if (!("classList" in document.createElement("_"))) {
     (function () {
         'use strict';
 
-        var WHITESPACE_CHARS, KNOWN_TLDS_FRAGMENT, LINK_REGEXP_TEXT, KNOWN_TLDS_REGEXP;
+        var WHITESPACE_CHARS, KNOWN_TLDS_FRAGMENT, LINK_REGEXP_TEXT, KNOWN_TLDS_REGEXP, LINK_REGEXP;
 
         WHITESPACE_CHARS = [' ', '\t', '\n', '\r', "\xA0", "\u2000", "\u2001", "\u2002", "\u2003", "\u2028", "\u2029"];
         KNOWN_TLDS_FRAGMENT = 'com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|' + 'xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|' + 'bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|' + 'fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|' + 'is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|' + 'mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|' + 'pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|' + 'tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw';
@@ -3355,6 +3392,8 @@ if (!("classList" in document.createElement("_"))) {
         LINK_REGEXP_TEXT = '(' + '((?:(https?://|ftps?://|nntp://)|www\\d{0,3}[.]|[a-z0-9.\\-]+[.](' + KNOWN_TLDS_FRAGMENT + ")\\/)\\S+(?:[^\\s`!\\[\\]{};:'\".,?\xAB\xBB\u201C\u201D\u2018\u2019]))" + ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
 
         KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
+
+        LINK_REGEXP = new RegExp(LINK_REGEXP_TEXT, 'gi');
 
         function nodeIsNotInsideAnchorTag(node) {
             return !MediumEditor.util.getClosestTag(node, 'a');
@@ -3506,12 +3545,11 @@ if (!("classList" in document.createElement("_"))) {
             },
 
             findLinkableText: function findLinkableText(contenteditable) {
-                var linkRegExp = new RegExp(LINK_REGEXP_TEXT, 'gi'),
-                    textContent = contenteditable.textContent,
+                var textContent = contenteditable.textContent,
                     match = null,
                     matches = [];
 
-                while ((match = linkRegExp.exec(textContent)) !== null) {
+                while ((match = LINK_REGEXP.exec(textContent)) !== null) {
                     var matchOk = true,
                         matchEnd = match.index + match[0].length;
 
@@ -4194,8 +4232,10 @@ if (!("classList" in document.createElement("_"))) {
 
                     if (rects.length) {
                         top += rects[0].top;
-                    } else {
+                    } else if (range.startContainer.getBoundingClientRect !== undefined) {
                         top += range.startContainer.getBoundingClientRect().top;
+                    } else {
+                        top += range.getBoundingClientRect().top;
                     }
                 }
 
@@ -5570,6 +5610,11 @@ if (!("classList" in document.createElement("_"))) {
                 return this.options.ownerDocument.execCommand('insertImage', false, src);
             }
 
+            if (action === 'html') {
+                var html = this.options.contentWindow.getSelection().toString().trim();
+                return MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, html);
+            }
+
             if (justifyAction.exec(action)) {
                 var result = this.options.ownerDocument.execCommand(action, false, null),
                     parentNode = MediumEditor.selection.getSelectedParentElement(MediumEditor.selection.getSelectionRange(this.options.ownerDocument));
@@ -6182,7 +6227,7 @@ if (!("classList" in document.createElement("_"))) {
     };
 
     MediumEditor.version = MediumEditor.parseVersionString.call(this, {
-        'version': '5.22.1'
+        'version': '5.23.2'
     }.version);
 
     return MediumEditor;
